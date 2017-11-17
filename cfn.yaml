@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'SumoLogic Log forwarder | 1.0.0'
+Parameters:
+  SumoLogicEndpoint:
+    Type: String
+    Description: 'URL of the hosted collector'
+Resources:
+  LogFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      Timeout: 30
+      CodeUri: log-forwarder
+      Environment:
+        Variables:
+          SUMO_ENDPOINT: !Ref SumoLogicEndpoint
+  LogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${LogFunction}'
+      RetentionInDays: 3
+
+  LogInvokeLambdaPermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: !GetAtt LogFunction.Arn
+      Action: 'lambda:InvokeFunction'
+      Principal: !Sub logs.${AWS::Region}.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+
+  ConfigureFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      Timeout: 30
+      CodeUri: loggroup-config
+      Policies:
+        Statement:
+          - Sid: 'AccessToCWLogs'
+            Effect: "Allow"
+            Action:
+            - 'logs:DescribeLogGroups'
+            - 'logs:DescribeSubscriptionFilters'
+            - 'logs:PutSubscriptionFilter'
+            - 'logs:PutRetentionPolicy'
+            Resource: '*'
+      Environment:
+        Variables:
+          FORWARDER_FUNCTION_NAME: !Ref LogFunction
+          FORWARDER_FUNCTION_ARN: !GetAtt LogFunction.Arn
+      Events:
+        Cron:
+          Type: Schedule
+          Properties:
+            Schedule: rate(5 minutes)

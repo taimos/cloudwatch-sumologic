@@ -1,0 +1,21 @@
+{
+  "name": "log-forwarder",
+  "version": "1.0.0",
+  "description": "SumoLogic log forwarder",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/eslint . "
+  },
+  "author": "Taimos GmbH",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "aws-sdk": "^2.100.0"
+  },
+  "devDependencies": {
+    "aws-sdk-mock": "^1.7.0",
+    "eslint": "^3.0.0",
+    "lambda-local": "^1.4.2",
+    "mocha": "^3.2.0",
+    "should": "^11.2.0"
+  }
+}
