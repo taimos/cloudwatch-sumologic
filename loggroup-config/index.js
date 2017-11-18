@@ -17,14 +17,18 @@ const listLogGroups = () => {
 const filterLogGroups = groups => {
   'use strict';
   return Promise.all(groups.map(group => {
-    return LOGS.describeSubscriptionFilters({logGroupName: group.name}).promise()
-      .then(res => {
-        return {
-          name: group.name,
-          retention: group.retention,
-          subscriptions: res.subscriptionFilters.map(filter => filter.destinationArn)
-        };
-      });
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        LOGS.describeSubscriptionFilters({logGroupName: group.name}).promise()
+          .then(res => {
+            resolve({
+              name: group.name,
+              retention: group.retention,
+              subscriptions: res.subscriptionFilters.map(filter => filter.destinationArn)
+            });
+          }, reject);
+      }, (groups.length / 3) * 1000);
+    });
   })).then(groups => {
     return groups
       .filter(grp => grp.subscriptions.length === 0)
