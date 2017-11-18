@@ -83,6 +83,10 @@ exports.handler = (event, context, callback) => {
       callback(null, 'Successfully configured log forwarding');
     })
     .catch(err => {
+      if (err.errorType && err.errorType === 'ThrottlingException') {
+        callback(null, 'Calls were throttled; trying again later');
+        return;
+      }
       console.log('ERROR: ', err, err.stack);
       callback(err);
     });
