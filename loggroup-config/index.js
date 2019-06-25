@@ -1,17 +1,20 @@
 const AWS = require('aws-sdk');
-const LOGS = new AWS.CloudWatchLogs({region: process.env.AWS_REGION});
+const LOGS = new AWS.CloudWatchLogs({region: process.env.AWS_REGION, maxRetries: 10});
 
-const listLogGroups = () => {
+const listLogGroups = async () => {
   'use strict';
-  // TODO recursion
-  return LOGS.describeLogGroups({}).promise().then(res => {
-    return res.logGroups.map(group => {
-      return {
+  let groups = [];
+  let res;
+  do {
+    res = await LOGS.describeLogGroups({nextToken: res ? res.nextToken : undefined}).promise();
+    res.logGroups.forEach(group => {
+      groups.push({
         name: group.logGroupName,
         retention: group.retentionInDays
-      };
+      });
     });
-  });
+  } while (res.nextToken);
+  return groups;
 };
 
 const filterLogGroups = groups => {
@@ -79,10 +82,6 @@ exports.handler = (event, context, callback) => {
       callback(null, 'Successfully configured log forwarding');
     })
     .catch(err => {
-      if (err.code && err.code === 'ThrottlingException') {
-        callback(null, 'Calls were throttled; trying again later');
-        return;
-      }
       console.log('ERROR: ', err, err.stack);
       callback(err);
     });
