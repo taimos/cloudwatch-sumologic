@@ -7,19 +7,17 @@
     "mocha": true
   },
   "parserOptions": {
-    "ecmaVersion": 6
+    "ecmaVersion": 8
   },
   "globals": {
     "Promise": true
   },
   "rules": {
     "no-console": 0,
-    // strict
     "strict": [
       2,
       "function"
     ],
-    // formatting, spaces, operators
     "indent": [
       2,
       2,
@@ -80,7 +78,6 @@
         "properties": "always"
       }
     ],
-    // coding style
     "curly": 2,
     "wrap-iife": [
       2,
@@ -91,8 +88,6 @@
     "no-unexpected-multiline": 2,
     "no-multi-str": 2,
     "no-irregular-whitespace": 2,
-    // os/git options
-    //    "no-trailing-spaces": 2,
     "linebreak-style": 0,
     "eol-last": 0
   }
