@@ -9,7 +9,7 @@
   "author": "Taimos GmbH",
   "license": "Apache-2.0",
   "dependencies": {
-    "aws-sdk": "^2.100.0"
+    "aws-sdk": "^2.814.0"
   },
   "devDependencies": {
     "aws-sdk-mock": "^1.7.0",
